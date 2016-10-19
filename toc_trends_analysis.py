@@ -9,7 +9,7 @@
 # Licence:     
 #------------------------------------------------------------------------------
 """ Tore has previously written code to perform trend analyses on the data in
-    RESA2. I haven't been able to find the code, but it appears to shifts data 
+    RESA2. I haven't been able to find the code, but it appears to shift data 
     between RESA2, Excel and Access, which seems a bit messy.
     
     In the notebook updated_toc_trends_analysis.ipynb, I tested some code which
@@ -17,7 +17,7 @@
     database and returning results as dataframes. This seems to have worked 
     well.
     
-    The code below takes the main function from this notebook and tidies them
+    The code below takes the main functions from this notebook and tidies them
     up a bit. This file can then be imported into new notebooks, which should
     make it easy to re-run trend analyses on different datasets in the future.
 """
@@ -190,7 +190,7 @@ def wc_stats(raw_df, st_yr=None, end_yr=None, plot=False, fold=None):
         # 7. Period
         st_yr = df.index.min()
         end_yr = df.index.max()
-        per = '%s-%s' % (st_yr, end_yr)
+        per = '%s-%s' % (int(st_yr), int(end_yr))
         data_dict['period'].append(per)
 
         # 8. M-K test
@@ -263,7 +263,8 @@ def read_resa2(proj_list, engine):
     import pandas as pd    
 
     # Get par IDs etc. for pars of interest
-    par_list = ['SO4', 'Cl', 'Ca', 'Mg', 'NO3-N', 'TOC', 'Al']
+    par_list = ['SO4', 'Cl', 'Ca', 'Mg', 'NO3-N', 'TOC', 
+                'Al', 'K', 'Na', 'NH4-N', 'pH']
     
     sql = ('SELECT * FROM resa2.parameter_definitions '
            'WHERE name in %s' % str(tuple(par_list)))
@@ -304,21 +305,32 @@ def read_resa2(proj_list, engine):
                                    % str(tuple(stn_df['station_id'].values)))
         
     wc_df = pd.read_sql_query(sql, engine)
-    
-    # Get all sample dates for sites and period of interest
+
+    # Get all sample dates for sites
     # We're only interested in surface sample (< 1 m from surface)
+#    if len(stn_df)==1:
+#        sql = ("SELECT water_sample_id, station_id, sample_date "
+#               "FROM resa2.water_samples "
+#               "WHERE station_id = %s "
+#               "AND depth1 <= 1 "
+#               "AND depth2 <= 1" % stn_df['station_id'].iloc[0])    
+#    else:
+#        sql = ("SELECT water_sample_id, station_id, sample_date "
+#               "FROM resa2.water_samples "
+#               "WHERE station_id IN %s "
+#               "AND depth1 <= 1 "
+#               "AND depth2 <= 1" % str(tuple(stn_df['station_id'].values)))
+
     if len(stn_df)==1:
-        sql = ("SELECT water_sample_id, station_id, sample_date "
+        sql = ("SELECT water_sample_id, station_id, sample_date, depth1, depth2 "
                "FROM resa2.water_samples "
                "WHERE station_id = %s "
-               "AND depth1 <= 1 "
-               "AND depth2 <= 1" % stn_df['station_id'].iloc[0])    
+               % stn_df['station_id'].iloc[0])    
     else:
-        sql = ("SELECT water_sample_id, station_id, sample_date "
+        sql = ("SELECT water_sample_id, station_id, sample_date, depth1, depth2 "
                "FROM resa2.water_samples "
                "WHERE station_id IN %s "
-               "AND depth1 <= 1 "
-               "AND depth2 <= 1" % str(tuple(stn_df['station_id'].values)))
+               % str(tuple(stn_df['station_id'].values)))
         
     samp_df = pd.read_sql_query(sql, engine)
     
@@ -336,6 +348,9 @@ def read_resa2(proj_list, engine):
     # Join in sample dates
     wc_df = pd.merge(wc_df, samp_df, how='left',
                      left_on='sample_id', right_on='water_sample_id')
+
+    # Get just the near-surface samples
+    wc_df = wc_df.query('(depth1 <= 1) and (depth2 <= 1)')
     
     # Join in parameter units
     sql = ('SELECT * FROM resa2.parameter_definitions')
@@ -352,7 +367,8 @@ def read_resa2(proj_list, engine):
     wc_df['value'] = wc_df['value'] * wc_df['conversion_factor']
     
     # Extract columns of interest
-    wc_df = wc_df[['station_id', 'sample_date', 'name', 'value']]
+    wc_df = wc_df[['station_id', 'sample_date', 'name', 
+                   'value', 'entered_date_x']]
     
     # Check for duplicates
     dup_df = wc_df[wc_df.duplicated(subset=['station_id',
@@ -361,27 +377,36 @@ def read_resa2(proj_list, engine):
                                             keep=False)].sort_values(by=['station_id', 
                                                                          'sample_date', 
                                                                          'name'])
+
     if len(dup_df) > 0:
         print ('    The database contains duplicate values for some station-'
-               'date-parameter combinations.\n    These will be averaged, but '
-               'you should check the repeated values are not errors.\n    The '
-               'duplicated entries are returned in a separate dataframe.\n')
+               'date-parameter combinations.\n    Only the most recent values '
+               'will be used, but you should check the repeated values are not '
+               'errors.\n    The duplicated entries are returned in a separate '
+               'dataframe.\n')
         
-        # Groupby station_id, date and par
-        grpd = wc_df.groupby(['station_id', 'sample_date', 'name'])
+        # Choose most recent record for each duplicate
+        wc_df.sort_values(by='entered_date_x', inplace=True, ascending=True)
+
+        # Drop duplicates
+        wc_df.drop_duplicates(subset=['station_id', 'sample_date', 'name'],
+                              keep='last', inplace=True)
         
-        # Calculate mean
-        wc_df = grpd.agg('mean')
+        # Sort
+        wc_df.sort_values(by=['station_id', 'sample_date', 'name'],
+                          inplace=True)
         
-        wc_df.reset_index(inplace=True)
-    
+        # Tidy
+        del wc_df['entered_date_x']               
+        wc_df.reset_index(inplace=True, drop=True)
+
     # Unstack
     wc_df.set_index(['station_id', 'sample_date', 'name'], inplace=True)
     wc_df = wc_df.unstack(level='name')
     wc_df.columns = wc_df.columns.droplevel()
     wc_df.reset_index(inplace=True)
     wc_df.columns.name = None
-    
+
     # Extract year from date column
     wc_df['year'] = wc_df['sample_date'].map(lambda x: x.year)
     del wc_df['sample_date']
@@ -391,7 +416,7 @@ def read_resa2(proj_list, engine):
     
     # Calculate median
     wc_df = grpd.agg('median')
-    
+
     return stn_df, wc_df, dup_df
 
 def conv_units_and_correct(wc_df):
@@ -408,20 +433,36 @@ def conv_units_and_correct(wc_df):
     import pandas as pd
     
     # Tabulate chemical properties
-    chem_dict = {'molar_mass':[96, 35, 40, 24, 14],
-                 'valency':[2, 1, 2, 2, 1],
-                 'resa2_ref_ratio':[0.103, 1., 0.037, 0.196, 'N/A']}
+    chem_dict = {'molar_mass':[96, 35, 40, 24, 14, 39, 23, 14],
+                 'valency':[2, 1, 2, 2, 1, 1, 1, 1],
+                 'resa2_ref_ratio':[0.103, 1., 0.037, 0.196, 
+                                    'N/A', 0.018, 0.859, 'N/A']}
     
-    chem_df = pd.DataFrame(chem_dict, index=['SO4', 'Cl', 'Ca', 'Mg', 'NO3-N'])
+    chem_df = pd.DataFrame(chem_dict, index=['SO4', 'Cl', 'Ca', 'Mg', 
+                                             'NO3-N', 'K', 'Na', 'NH4-N'])
     chem_df = chem_df[['molar_mass', 'valency', 'resa2_ref_ratio']]
+
+    # Fill NoData for ANC calculation. Assume that NH4 can be ignored if not 
+    # present.
+    # If have data for NH4, fill data gaps with 0
+    if 'NH4-N' in wc_df.columns:
+        wc_df['NH4-N'].fillna(value=0, inplace=True)
+    else: # Just assume 0
+        wc_df['NH4-N'] = 0    
     
     # 1. Convert to ueq/l
-    for par in ['SO4', 'Cl', 'Mg', 'Ca', 'NO3-N']:
+    # 1.1. pH to H+
+    wc_df['EH'] = 1E6 * 10**(-wc_df['pH'])
+    
+    # 1.2. Other pars
+    for par in ['SO4', 'Cl', 'Mg', 'Ca', 'NO3-N', 'K', 'Na', 'NH4-N']:
         val = chem_df.ix[par, 'valency']
         mm = chem_df.ix[par, 'molar_mass']
         
         if par == 'NO3-N':
             wc_df['ENO3'] = wc_df[par] * val / mm
+        elif par == 'NH4-N':
+            wc_df['ENH4'] = wc_df[par] * val / mm
         else:
             wc_df['E%s' % par] = wc_df[par] * val * 1000. / mm
     
@@ -440,11 +481,14 @@ def conv_units_and_correct(wc_df):
     # 3.3. ECaX + EMgX
     wc_df['ECaX_EMgX'] = wc_df['ECaX'] + wc_df['EMgX']
     
-    # 3.4. ESO4 + ECl + ENO3
-    wc_df['ESO4_ECl_ENO3'] = wc_df['ESO4'] + wc_df['ECl'] + wc_df['ENO3']
+    # 3.4. ANC = (ECa+EMg+EK+ENa+ENH4) - (ECl+ESO4+ENO3)
+    wc_df['ANC'] = ((wc_df['ECa'] + wc_df['EMg'] + wc_df['EK'] + 
+                     wc_df['ENa'] + wc_df['ENH4']) - 
+                    (wc_df['ECl'] + wc_df['ESO4'] + wc_df['ENO3']))
     
     # 4. Delete unnecessary columns and tidy
-    for col in ['SO4', 'Cl', 'Mg', 'Ca', 'NO3-N']:
+    for col in ['SO4', 'Cl', 'Mg', 'Ca', 'NO3-N', 'K', 'Na', 'NH4-N', 'pH',
+                'EMg', 'ECa', 'EK', 'ENa', 'ENH4', 'EMgX', 'ECaX']:
         del wc_df[col]
     
     wc_df.reset_index(inplace=True)
@@ -520,6 +564,11 @@ def run_trend_analysis(proj_list, engine, st_yr=None, end_yr=None,
    
     res_df = pd.concat(df_list, axis=0)
 
+    # Convert station_id cols to ints
+    res_df['station_id'] = res_df['station_id'].map(int)
+    dup_df['station_id'] = dup_df['station_id'].map(int)
+    no_data_df['station_id'] = no_data_df['station_id'].map(int)
+    
     print '    Done.'    
     print '\nFinished.'
     
