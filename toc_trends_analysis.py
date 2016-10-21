@@ -307,20 +307,6 @@ def read_resa2(proj_list, engine):
     wc_df = pd.read_sql_query(sql, engine)
 
     # Get all sample dates for sites
-    # We're only interested in surface sample (< 1 m from surface)
-#    if len(stn_df)==1:
-#        sql = ("SELECT water_sample_id, station_id, sample_date "
-#               "FROM resa2.water_samples "
-#               "WHERE station_id = %s "
-#               "AND depth1 <= 1 "
-#               "AND depth2 <= 1" % stn_df['station_id'].iloc[0])    
-#    else:
-#        sql = ("SELECT water_sample_id, station_id, sample_date "
-#               "FROM resa2.water_samples "
-#               "WHERE station_id IN %s "
-#               "AND depth1 <= 1 "
-#               "AND depth2 <= 1" % str(tuple(stn_df['station_id'].values)))
-
     if len(stn_df)==1:
         sql = ("SELECT water_sample_id, station_id, sample_date, depth1, depth2 "
                "FROM resa2.water_samples "
