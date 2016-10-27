@@ -156,6 +156,8 @@ def wc_stats(raw_df, st_yr=None, end_yr=None, plot=False, fold=None):
     data_dict = {'station_id':[],
                  'par_id':[],
                  'non_missing':[],
+                 'n_start':[],
+                 'n_end':[],
                  'median':[],
                  'mean':[],
                  'std_dev':[],
@@ -178,22 +180,38 @@ def wc_stats(raw_df, st_yr=None, end_yr=None, plot=False, fold=None):
         # 3. Non-missing
         data_dict['non_missing'].append(pd.notnull(df[col]).sum())
         
-        # 4. Median
+        # 4. Number of non nulls at start
+        if st_yr:
+            # Record the number of non-nulls within 5 years of start year
+            data_dict['n_start'].append(pd.notnull(df[df.index<(st_yr+5)][col]).sum())
+        else:
+            # Record the number of non-nulls in first 5 years of record
+            data_dict['n_start'].append(pd.notnull(df[col].head(5)).sum())
+
+        # 5. Number of non nulls at end
+        if end_yr:
+            # Record the number of non-nulls within 5 years of end year
+            data_dict['n_end'].append(pd.notnull(df[df.index>(end_yr-5)][col]).sum())
+        else:
+            # Record the number of non-nulls in last 5 years of record
+            data_dict['n_end'].append(pd.notnull(df[col].tail(5)).sum())
+        
+        # 6. Median
         data_dict['median'].append(df[col].median())
         
-        # 5. Mean
+        # 7. Mean
         data_dict['mean'].append(df[col].mean())
         
-        # 6. Std dev
+        # 8. Std dev
         data_dict['std_dev'].append(df[col].std())
         
-        # 7. Period
+        # 9. Period
         st_yr = df.index.min()
         end_yr = df.index.max()
         per = '%s-%s' % (int(st_yr), int(end_yr))
         data_dict['period'].append(per)
 
-        # 8. M-K test
+        # 10. M-K test
         # Drop missing values
         mk_df = df[[col]].dropna(how='any')
 
@@ -206,14 +224,14 @@ def wc_stats(raw_df, st_yr=None, end_yr=None, plot=False, fold=None):
             data_dict['mk_p_val'].append(p)
             data_dict['trend'].append(trend)      
 
-            # 8. Sen's slope. Returns:
+            # 11. Sen's slope. Returns:
             # Median slope, median intercept, 95% CI lower bound, 
             # 95% CI upper bound
             sslp, icpt, lb, ub = theilslopes(mk_df[col].values, 
                                              mk_df.index, 0.95)
             data_dict['sen_slp'].append(sslp)
             
-            # 9. Plot if desired
+            # 12. Plot if desired
             if plot:
                 fig = plt.figure()
                 plt.plot(mk_df.index, mk_df[col].values, 'bo-')
@@ -241,9 +259,9 @@ def wc_stats(raw_df, st_yr=None, end_yr=None, plot=False, fold=None):
     
     # Build to df
     res_df = pd.DataFrame(data_dict)
-    res_df = res_df[['station_id', 'par_id', 'period', 'non_missing',
-                     'mean', 'median', 'std_dev', 'mk_stat', 'norm_mk_stat',
-                     'mk_p_val', 'mk_std_dev', 'trend', 'sen_slp']]    
+    res_df = res_df[['station_id', 'par_id', 'period', 'non_missing', 'n_start',
+                     'n_end', 'mean', 'median', 'std_dev', 'mk_stat', 
+                     'norm_mk_stat', 'mk_p_val', 'mk_std_dev', 'trend', 'sen_slp']]    
     
     return res_df
     
