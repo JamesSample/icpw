@@ -143,127 +143,129 @@ def wc_stats(raw_df, st_yr=None, end_yr=None, plot=False, fold=None):
         df = df.query('YEAR >= @st_yr')
     if end_yr:
         df = df.query('YEAR <= @end_yr')
-    
-    # Get stn_id
-    stn_id = df['STATION_ID'].iloc[0]
-    
-    # Tidy up df
-    df.index = df['YEAR']
-    df.sort_index(inplace=True)
-    del df['STATION_ID'], df['YEAR']
-    
-    # Container for results
-    data_dict = {'station_id':[],
-                 'par_id':[],
-                 'non_missing':[],
-                 'n_start':[],
-                 'n_end':[],
-                 'median':[],
-                 'mean':[],
-                 'std_dev':[],
-                 'period':[],
-                 'mk_std_dev':[],
-                 'mk_stat':[],
-                 'norm_mk_stat':[],
-                 'mk_p_val':[],
-                 'trend':[],
-                 'sen_slp':[]}
-    
-    # Loop over pars
-    for col in df.columns:
-        # 1. Station ID
-        data_dict['station_id'].append(stn_id)
-        
-        # 2. Par ID
-        data_dict['par_id'].append(col)
-        
-        # 3. Non-missing
-        data_dict['non_missing'].append(pd.notnull(df[col]).sum())
-        
-        # 4. Number of non nulls at start
-        if st_yr:
-            # Record the number of non-nulls within 5 years of start year
-            data_dict['n_start'].append(pd.notnull(df[df.index<(st_yr+5)][col]).sum())
-        else:
-            # Record the number of non-nulls in first 5 years of record
-            data_dict['n_start'].append(pd.notnull(df[col].head(5)).sum())
 
-        # 5. Number of non nulls at end
-        if end_yr:
-            # Record the number of non-nulls within 5 years of end year
-            data_dict['n_end'].append(pd.notnull(df[df.index>(end_yr-5)][col]).sum())
-        else:
-            # Record the number of non-nulls in last 5 years of record
-            data_dict['n_end'].append(pd.notnull(df[col].tail(5)).sum())
+    # Only continue if data
+    if len(df) > 0:
+        # Get stn_id
+        stn_id = df['STATION_ID'].iloc[0]
         
-        # 6. Median
-        data_dict['median'].append(df[col].median())
+        # Tidy up df
+        df.index = df['YEAR']
+        df.sort_index(inplace=True)
+        del df['STATION_ID'], df['YEAR']
         
-        # 7. Mean
-        data_dict['mean'].append(df[col].mean())
+        # Container for results
+        data_dict = {'station_id':[],
+                     'par_id':[],
+                     'non_missing':[],
+                     'n_start':[],
+                     'n_end':[],
+                     'median':[],
+                     'mean':[],
+                     'std_dev':[],
+                     'period':[],
+                     'mk_std_dev':[],
+                     'mk_stat':[],
+                     'norm_mk_stat':[],
+                     'mk_p_val':[],
+                     'trend':[],
+                     'sen_slp':[]}
         
-        # 8. Std dev
-        data_dict['std_dev'].append(df[col].std())
-        
-        # 9. Period
-        st_yr = df.index.min()
-        end_yr = df.index.max()
-        per = '%s-%s' % (int(st_yr), int(end_yr))
-        data_dict['period'].append(per)
-
-        # 10. M-K test
-        # Drop missing values
-        mk_df = df[[col]].dropna(how='any')
-
-        # Only run stats if more than 1 valid value
-        if len(mk_df) > 1:
-            var_s, s, z, p, trend = mk_test(mk_df[col].values, stn_id, col)
-            data_dict['mk_std_dev'].append(np.sqrt(var_s)) 
-            data_dict['mk_stat'].append(s)
-            data_dict['norm_mk_stat'].append(z)
-            data_dict['mk_p_val'].append(p)
-            data_dict['trend'].append(trend)      
-
-            # 11. Sen's slope. Returns:
-            # Median slope, median intercept, 95% CI lower bound, 
-            # 95% CI upper bound
-            sslp, icpt, lb, ub = theilslopes(mk_df[col].values, 
-                                             mk_df.index, 0.95)
-            data_dict['sen_slp'].append(sslp)
+        # Loop over pars
+        for col in df.columns:
+            # 1. Station ID
+            data_dict['station_id'].append(stn_id)
             
-            # 12. Plot if desired
-            if plot:
-                fig = plt.figure()
-                plt.plot(mk_df.index, mk_df[col].values, 'bo-')
-                plt.plot(mk_df.index, mk_df.index*sslp + icpt, 'k-')
-                if col in ('Al', 'TOC'):
-                    plt.ylabel('%s (mg/l)' % col, fontsize=24)
-                else:
-                    plt.ylabel('%s (ueq/l)' % col, fontsize=24)
-                plt.title('%s at station %s' % (col, int(stn_id)),
-                          fontsize=32)
-                plt.tight_layout()
+            # 2. Par ID
+            data_dict['par_id'].append(col)
+            
+            # 3. Non-missing
+            data_dict['non_missing'].append(pd.notnull(df[col]).sum())
+            
+            # 4. Number of non nulls at start
+            if st_yr:
+                # Record the number of non-nulls within 5 years of start year
+                data_dict['n_start'].append(pd.notnull(df[df.index<(st_yr+5)][col]).sum())
+            else:
+                # Record the number of non-nulls in first 5 years of record
+                data_dict['n_start'].append(pd.notnull(df[col].head(5)).sum())
+    
+            # 5. Number of non nulls at end
+            if end_yr:
+                # Record the number of non-nulls within 5 years of end year
+                data_dict['n_end'].append(pd.notnull(df[df.index>(end_yr-5)][col]).sum())
+            else:
+                # Record the number of non-nulls in last 5 years of record
+                data_dict['n_end'].append(pd.notnull(df[col].tail(5)).sum())
+            
+            # 6. Median
+            data_dict['median'].append(df[col].median())
+            
+            # 7. Mean
+            data_dict['mean'].append(df[col].mean())
+            
+            # 8. Std dev
+            data_dict['std_dev'].append(df[col].std())
+            
+            # 9. Period
+            st_yr = df.index.min()
+            end_yr = df.index.max()
+            per = '%s-%s' % (int(st_yr), int(end_yr))
+            data_dict['period'].append(per)
+    
+            # 10. M-K test
+            # Drop missing values
+            mk_df = df[[col]].dropna(how='any')
+    
+            # Only run stats if more than 1 valid value
+            if len(mk_df) > 1:
+                var_s, s, z, p, trend = mk_test(mk_df[col].values, stn_id, col)
+                data_dict['mk_std_dev'].append(np.sqrt(var_s)) 
+                data_dict['mk_stat'].append(s)
+                data_dict['norm_mk_stat'].append(z)
+                data_dict['mk_p_val'].append(p)
+                data_dict['trend'].append(trend)      
+    
+                # 11. Sen's slope. Returns:
+                # Median slope, median intercept, 95% CI lower bound, 
+                # 95% CI upper bound
+                sslp, icpt, lb, ub = theilslopes(mk_df[col].values, 
+                                                 mk_df.index, 0.95)
+                data_dict['sen_slp'].append(sslp)
                 
-                # Save fig
-                out_path = os.path.join(fold,
-                                        '%s_%s_%s-%s.png' % (int(stn_id), col, 
-                                                             st_yr, end_yr))
-                plt.savefig(out_path, dpi=150)
-                plt.close()
-            
-        # Otherwise all NaN
-        else:
-            for par in ['mk_std_dev', 'mk_stat', 'norm_mk_stat', 
-                        'mk_p_val', 'trend', 'sen_slp']:
-                data_dict[par].append(np.nan)
-    
-    # Build to df
-    res_df = pd.DataFrame(data_dict)
-    res_df = res_df[['station_id', 'par_id', 'period', 'non_missing', 'n_start',
-                     'n_end', 'mean', 'median', 'std_dev', 'mk_stat', 
-                     'norm_mk_stat', 'mk_p_val', 'mk_std_dev', 'trend', 'sen_slp']]    
-    
-    return res_df
+                # 12. Plot if desired
+                if plot:
+                    fig = plt.figure()
+                    plt.plot(mk_df.index, mk_df[col].values, 'bo-')
+                    plt.plot(mk_df.index, mk_df.index*sslp + icpt, 'k-')
+                    if col in ('Al', 'TOC'):
+                        plt.ylabel('%s (mg/l)' % col, fontsize=24)
+                    else:
+                        plt.ylabel('%s (ueq/l)' % col, fontsize=24)
+                    plt.title('%s at station %s' % (col, int(stn_id)),
+                              fontsize=32)
+                    plt.tight_layout()
+                    
+                    # Save fig
+                    out_path = os.path.join(fold,
+                                            '%s_%s_%s-%s.png' % (int(stn_id), col, 
+                                                                 st_yr, end_yr))
+                    plt.savefig(out_path, dpi=150)
+                    plt.close()
+                
+            # Otherwise all NaN
+            else:
+                for par in ['mk_std_dev', 'mk_stat', 'norm_mk_stat', 
+                            'mk_p_val', 'trend', 'sen_slp']:
+                    data_dict[par].append(np.nan)
+        
+        # Build to df
+        res_df = pd.DataFrame(data_dict)
+        res_df = res_df[['station_id', 'par_id', 'period', 'non_missing', 'n_start',
+                         'n_end', 'mean', 'median', 'std_dev', 'mk_stat', 
+                         'norm_mk_stat', 'mk_p_val', 'mk_std_dev', 'trend', 'sen_slp']]    
+        
+        return res_df
     
 def read_resa2(proj_list, engine):
     """ Reads raw data for the specified projects from RESA2. Extracts only
