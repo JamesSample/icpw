@@ -18,4 +18,4 @@ Getting to grips with the ICPW database and recoding/extending Tore's original w
 
 ## TOC trends (1990 - 2016)
 
-A major review of the ICPW database was undertaken during 2018. Site selections were reviewed and datasets expanded to cover the period 1990 to 2016. Trends were then recalculated using these improved datasets. 
+A major review of the ICPW database was undertaken during 2018. Site selections were reviewed and datasets expanded to cover the period 1990 to 2016. Trends were then recalculated using the improved datasets. 
