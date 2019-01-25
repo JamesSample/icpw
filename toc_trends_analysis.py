@@ -55,8 +55,8 @@ def mk_test(x, stn_id, par, alpha=0.05):
     
     # calculate S 
     s = 0
-    for k in xrange(n-1):
-        for j in xrange(k+1,n):
+    for k in range(n-1):
+        for j in range(k+1,n):
             s += np.sign(x[j] - x[k])
     
     # calculate the unique data
@@ -68,7 +68,7 @@ def mk_test(x, stn_id, par, alpha=0.05):
         var_s = (n*(n-1)*(2*n+5))/18.           
     else: # there are some ties in data
         tp = np.zeros(unique_x.shape)
-        for i in xrange(len(unique_x)):
+        for i in range(len(unique_x)):
             tp[i] = sum(unique_x[i] == x)
         # Sat Kumar's code has "+ np.sum", which is incorrect
         var_s = (n*(n-1)*(2*n+5) - np.sum(tp*(tp-1)*(2*tp+5)))/18.
@@ -528,7 +528,7 @@ def run_trend_analysis(proj_list, engine, st_yr=None, end_yr=None,
         assert os.path.isdir(fold), 'The specified folder does not exist.'
     
     # Get raw data from db
-    print 'Extracting data from RESA2...'
+    print ('Extracting data from RESA2...')
     stn_df, wc_df, dup_df = read_resa2(proj_list, engine)
     
     # Identify stations with no relevant records
@@ -542,19 +542,19 @@ def run_trend_analysis(proj_list, engine, st_yr=None, end_yr=None,
     else:
         no_data_df = None
     
-    print '    Done.'
+    print ('    Done.')
     
     # Convert units and apply sea-salt correction
-    print '\nConverting units and applying sea-salt correction...'
+    print ('\nConverting units and applying sea-salt correction...')
     wc_df = conv_units_and_correct(wc_df)
-    print '    Done.'
+    print ('    Done.')
     
     # Calculate stats    
     # Container for output
     df_list = []
 
     # Loop over sites
-    print '\nCalculating statistics...'
+    print ('\nCalculating statistics...')
     for stn_id in wc_df['station_id'].unique():
         # Extract data for this site
         df = wc_df.query('station_id == @stn_id')
@@ -582,9 +582,10 @@ def run_trend_analysis(proj_list, engine, st_yr=None, end_yr=None,
     # Convert station_id cols to ints
     res_df['station_id'] = res_df['station_id'].map(int)
     dup_df['station_id'] = dup_df['station_id'].map(int)
-    no_data_df['station_id'] = no_data_df['station_id'].map(int)
+    if no_data_df:
+        no_data_df['station_id'] = no_data_df['station_id'].map(int)
     
-    print '    Done.'    
-    print '\nFinished.'
+    print ('    Done.')   
+    print ('\nFinished.')
     
     return res_df, dup_df, no_data_df
