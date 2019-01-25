@@ -20,6 +20,6 @@ Getting to grips with the ICPW database and recoding/extending Tore's original w
 
 A major review of the ICPW database was undertaken during 2018. Site selections were reviewed and datasets expanded to cover the period 1990 to 2016. Trends were then recalculated using the improved datasets. 
 
-      * [Part 1 - Data upload](http://nbviewer.jupyter.org/github/JamesSample/icpw/blob/master/toc_trends_oct_2018_part1.ipynb)
-      * [Part 2 - Chemistry trends](http://nbviewer.jupyter.org/github/JamesSample/icpw/blob/master/toc_trends_oct_2018_part2.ipynb)
-      * [Part 3 - Climate trends](http://nbviewer.jupyter.org/github/JamesSample/icpw/blob/master/toc_trends_oct_2018_part3.ipynb)
+ * [Part 1 - Data upload](http://nbviewer.jupyter.org/github/JamesSample/icpw/blob/master/toc_trends_oct_2018_part1.ipynb)
+ * [Part 2 - Chemistry trends](http://nbviewer.jupyter.org/github/JamesSample/icpw/blob/master/toc_trends_oct_2018_part2.ipynb)
+ * [Part 3 - Climate trends](http://nbviewer.jupyter.org/github/JamesSample/icpw/blob/master/toc_trends_oct_2018_part3.ipynb)
