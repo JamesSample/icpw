@@ -18,8 +18,16 @@ Getting to grips with the ICPW database and recoding/extending Tore's original w
 
 ## TOC trends (1990 - 2016)
 
-A major review of the ICPW database was undertaken during 2018. Site selections were reviewed and datasets expanded to cover the period 1990 to 2016. Trends were then recalculated using the improved datasets. 
+A major review of the ICPW database was undertaken during 2018/19. The work can be divided into two components: (i) a expanded analysis comprising 430 "TOC trends" stations, with the aim of updating the [work published in 2007](https://www.nature.com/articles/nature06316); and (ii) a clean-up of the ~260 "core" ICP Waters stations, with the aim of writing a more general "Thematic Report" on TOC trends during 2019.
+
+### TOC trends paper
+
+For the broader "TOC Trends" work, a new project was created, site selections were reviewed and datasets expanded to cover the period 1990 to 2016. Trends were then recalculated using the improved datasets. 
 
  * [Part 1 - Data upload](http://nbviewer.jupyter.org/github/JamesSample/icpw/blob/master/toc_trends_oct_2018_part1.ipynb)
  * [Part 2 - Chemistry trends](http://nbviewer.jupyter.org/github/JamesSample/icpw/blob/master/toc_trends_oct_2018_part2.ipynb)
  * [Part 3 - Climate trends](http://nbviewer.jupyter.org/github/JamesSample/icpw/blob/master/toc_trends_oct_2018_part3.ipynb)
+ 
+### Thematic report
+ 
+Data for the "core" ICP Waters project(s) was first reviewed and tidied, and then checked for consistency with the data provided for the broader trends paper (above). Corrections were made as necessary, including replacing/substituting stations in some countries in order to make use of the best long-term monitoring datasets currently available.
