@@ -31,3 +31,5 @@ For the broader "TOC Trends" work, a new project was created, site selections we
 ### Thematic report
  
 Data for the "core" ICP Waters project(s) was first reviewed and tidied, and then checked for consistency with the data provided for the broader trends paper (above). Corrections were made as necessary, including replacing/substituting stations in some countries in order to make use of the best long-term monitoring datasets currently available.
+
+ * [Part 1 - Data cleaning & upload](https://nbviewer.jupyter.org/github/JamesSample/icpw/blob/master/toc_report_feb_2019_part1.ipynb)
