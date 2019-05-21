@@ -564,13 +564,11 @@ def run_trend_analysis(proj_list, engine, st_yr=None, end_yr=None,
         names[:2] = ['STATION_ID', 'YEAR']
         df.columns = names
 
-        # Added 23/05/2017
         # Heleen wants the annual time series for each site for further analysis
         # Write df to output
-        #out_ann_fold = (r'C:\Data\James_Work\Staff\Heleen_d_W\ICP_Waters\TOC_Trends_Analysis_2015'
-        #                r'\Results\annual_chemistry_series')
+        #out_ann_fold = (r'../../../Thematic_Trends_Report_2019/results/annual_chemistry_series')
         #out_ann_path = os.path.join(out_ann_fold, 'stn_%s.csv' % stn_id)
-        #df_trunc = df.query('(YEAR>=1990) & (YEAR<=2012)') # Truncate to 1990 to 2012
+        #df_trunc = df.query('(YEAR>=1990) & (YEAR<=2016)') # Truncate to 1990 to 2016
         #df_trunc.to_csv(out_ann_path)        
         
         # Run analysis
@@ -582,7 +580,7 @@ def run_trend_analysis(proj_list, engine, st_yr=None, end_yr=None,
     # Convert station_id cols to ints
     res_df['station_id'] = res_df['station_id'].map(int)
     dup_df['station_id'] = dup_df['station_id'].map(int)
-    if no_data_df:
+    if no_data_df is not None:
         no_data_df['station_id'] = no_data_df['station_id'].map(int)
     
     print ('    Done.')   
