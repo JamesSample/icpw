@@ -32,4 +32,14 @@ For the broader "TOC Trends" work, a new project was created, site selections we
  
 Data for the "core" ICP Waters project(s) was first reviewed and tidied, and then checked for consistency with the data provided for the broader trends paper (above). Corrections were made as necessary, including replacing/substituting stations in some countries in order to make use of the best long-term monitoring datasets currently available.
 
- * [Part 1 - Data cleaning & upload](https://nbviewer.jupyter.org/github/JamesSample/icpw/blob/master/toc_report_feb_2019_part1.ipynb)
+ * **Update "trends" dataset**. The latest work using the "trends" dataset is documented above under the heading *"TOC Trends paper"*
+ 
+ * **[Update "core" dataset](https://nbviewer.jupyter.org/github/JamesSample/icpw/blob/master/toc_report_feb_2019_part1.ipynb)**. Adding recent data for the "core" stations and dealing with data issues
+ 
+ * **[Combining the "core" and "trends" datasets](https://nbviewer.jupyter.org/github/JamesSample/icpw/blob/master/toc_report_feb_2019_part3.ipynb)**. An overview of the unified ICPW dataset of 556 stations
+ 
+ * **[Scatterplots of annual data](https://nbviewer.jupyter.org/github/JamesSample/icpw/blob/master/toc_report_feb_2019_part4_wge_plots.ipynb)**. A high-level overview of the raw data, aggregated to annual medians
+ 
+ * **[Stations with high frequency monitoring](https://nbviewer.jupyter.org/github/JamesSample/icpw/blob/master/toc_report_feb_2019_part5_hi_freq.ipynb)**. Ten stations have substantially more detailed monitoring than the others (approximately 25 to 100 samples per year from 1990 to 2016). This notebook performs trend and change point analyses based on *monthly* data, using algorithms that are too "data hungry" to be applied elsewhere
+ 
+ * **[Stations with "standard" monitoring](https://nbviewer.jupyter.org/github/JamesSample/icpw/blob/master/toc_report_feb_2019_part6.ipynb)**. Trend and change point analyses using *annually* aggregated data
