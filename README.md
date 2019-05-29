@@ -43,3 +43,5 @@ Data for the "core" ICP Waters project(s) was first reviewed and tidied, and the
  * **[Stations with high frequency monitoring](https://nbviewer.jupyter.org/github/JamesSample/icpw/blob/master/toc_report_feb_2019_part5_hi_freq.ipynb)**. Ten stations have substantially more detailed monitoring than the others (approximately 25 to 100 samples per year from 1990 to 2016). This notebook performs trend and change point analyses based on *monthly* data, using algorithms that are too "data hungry" to be applied elsewhere
  
  * **[Stations with "standard" monitoring](https://nbviewer.jupyter.org/github/JamesSample/icpw/blob/master/toc_report_feb_2019_part6.ipynb)**. Trend and change point analyses using *annually* aggregated data
+ 
+ * **[Summary of work for Task Force meeting](https://nbviewer.jupyter.org/github/JamesSample/icpw/blob/master/toc_report_feb_2019_part7.ipynb)**. An overview of the analysis prior to the Task Force meeting in Helsinki in June 2019
