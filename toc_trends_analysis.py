@@ -491,6 +491,11 @@ def conv_units_and_correct(wc_df):
     wc_df['ANC'] = ((wc_df['ECa'] + wc_df['EMg'] + wc_df['EK'] + 
                      wc_df['ENa'] + wc_df['ENH4']) - 
                     (wc_df['ECl'] + wc_df['ESO4'] + wc_df['ENO3']))
+
+    # 3.5. ANCX = (ECaX+EMgX+EK+ENa+ENH4) - (ECl+ESO4X+ENO3)
+    wc_df['ANCX'] = ((wc_df['ECaX'] + wc_df['EMgX'] + wc_df['EK'] + 
+                     wc_df['ENa'] + wc_df['ENH4']) - 
+                    (wc_df['ECl'] + wc_df['ESO4X'] + wc_df['ENO3']))
     
     # 4. Delete unnecessary columns and tidy
     for col in ['SO4', 'Cl', 'Mg', 'Ca', 'NO3-N', 'K', 'Na', 'NH4-N', 'pH',
