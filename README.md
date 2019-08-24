@@ -28,7 +28,7 @@ For the broader "TOC Trends" work, a new project was created, site selections we
  * [Part 2 - Chemistry trends](http://nbviewer.jupyter.org/github/JamesSample/icpw/blob/master/toc_trends_oct_2018_part2.ipynb)
  * [Part 3 - Climate trends](http://nbviewer.jupyter.org/github/JamesSample/icpw/blob/master/toc_trends_oct_2018_part3.ipynb)
  
- A selection of tidied/processed datasets used in the subsequent analysis are [here](https://github.com/JamesSample/icpw/tree/master/trends_paper_datasets).
+ A selection of tidied/processed datasets used in the subsequent analysis is [here](https://github.com/JamesSample/icpw/tree/master/trends_paper_datasets).
  
 ### Thematic report
  
