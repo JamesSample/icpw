@@ -28,6 +28,8 @@ For the broader "TOC Trends" work, a new project was created, site selections we
  * [Part 2 - Chemistry trends](http://nbviewer.jupyter.org/github/JamesSample/icpw/blob/master/toc_trends_oct_2018_part2.ipynb)
  * [Part 3 - Climate trends](http://nbviewer.jupyter.org/github/JamesSample/icpw/blob/master/toc_trends_oct_2018_part3.ipynb)
  
+ A selection of tidied/processed datasets used in the subsequent analysis are [here](https://github.com/JamesSample/icpw/tree/master/trends_paper_datasets).
+ 
 ### Thematic report
  
 Data for the "core" ICP Waters project(s) was first reviewed and tidied, and then checked for consistency with the data provided for the broader trends paper (above). Corrections were made as necessary, including replacing/substituting stations in some countries in order to make use of the best long-term monitoring datasets currently available.
