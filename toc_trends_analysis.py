@@ -462,8 +462,8 @@ def conv_units_and_correct(wc_df):
     
     # 1.2. Other pars
     for par in ['SO4', 'Cl', 'Mg', 'Ca', 'NO3-N', 'K', 'Na', 'NH4-N']:
-        val = chem_df.ix[par, 'valency']
-        mm = chem_df.ix[par, 'molar_mass']
+        val = chem_df.at[par, 'valency']
+        mm = chem_df.at[par, 'molar_mass']
         
         if par == 'NO3-N':
             wc_df['ENO3'] = wc_df[par] * val / mm
@@ -474,7 +474,7 @@ def conv_units_and_correct(wc_df):
     
     # 2. Apply sea-salt correction
     for par in ['ESO4', 'EMg', 'ECa']:
-        ref = chem_df.ix[par[1:], 'resa2_ref_ratio']
+        ref = chem_df.at[par[1:], 'resa2_ref_ratio']
         wc_df['%sX' % par] = wc_df[par] - (ref*wc_df['ECl'])
         
     # 3. Calculate combinations
